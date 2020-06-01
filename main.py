@@ -26,7 +26,7 @@ class CustomCanvas(Canvas):
         super().__init__(
             self.window, width=width, height=height, bg=Color.BLACK
         )
-        self.create_image((width, height), image=self.image)
+        self.create_image((width//2, height//2), image=self.image)
         self.pack()
 
     def draw(self, x, y, color=Color.WHITE):
@@ -37,11 +37,35 @@ class CustomCanvas(Canvas):
         mainloop()
 
 
+class Line:
+    def __init__(self, canvas):
+        self.canvas = canvas
+
+    def draw(self, x0, y0, x1, y1, color=Color.WHITE):
+        reverse = False
+
+        if abs(x0 - x1) < abs(y0 - y1):
+            reverse = True
+            x0, y0 = y0, x0
+            x1, y1, = y1, x1
+
+        if x0 > x1:
+            x0, y0 = y0, x0
+            x1, y1, = y1, x1
+
+        for x in range(x0, x1):
+            step = (x - x0) / (x1 - x0)
+            y = int((y0 * (1 - step)) + (y1 * step))
+
+            if reverse:
+                self.canvas.draw(y, x, color)
+            else:
+                self.canvas.draw(x, y, color)
+
+
 if __name__ == '__main__':
     canvas = CustomCanvas()
 
-    canvas.draw(50, 42)
-    canvas.draw(73, 36)
-    canvas.draw(44, 61)
+    Line(canvas).draw(180, 200, 390, 400)
 
     canvas.display()
