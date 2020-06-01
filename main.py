@@ -53,14 +53,23 @@ class Line:
             x0, y0 = y0, x0
             x1, y1, = y1, x1
 
-        for x in range(x0, x1):
-            step = (x - x0) / (x1 - x0)
-            y = int((y0 * (1 - step)) + (y1 * step))
+        y = y0
+        error = 0
+        dx = x1 - x0
+        dy = y1 - y0
+        derror = abs(dy / dx)
 
+        for x in range(x0, x1):
             if reverse:
                 self.canvas.draw(y, x, color)
             else:
                 self.canvas.draw(x, y, color)
+
+            error += derror
+
+            if error > 0.5:
+                y += 1 if y1 > y0 else -1
+                error -= 1
 
 
 if __name__ == '__main__':
