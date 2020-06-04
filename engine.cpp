@@ -36,7 +36,7 @@ public:
         );
 
         if (Window::object == NULL) {
-            std::cout << "Error creating window" << std::endl;
+            std::cerr << "Error creating window" << std::endl;
         }
     }
 
@@ -54,6 +54,7 @@ class Render {
 
 public:
     SDL_Renderer *object;
+
     const int RENDERING_DRIVER_INDEX = -1;
 
     Render(Window *window) {
@@ -64,7 +65,7 @@ public:
         );
 
         if (Render::object == NULL) {
-            std::cout << "Error creating render" << std::endl;
+            std::cerr << "Error creating render" << std::endl;
         }
     }
 
@@ -120,14 +121,37 @@ public:
 };
 
 
+class AbstractPrimitive {
+public:
+    Render *render;
+
+    AbstractPrimitive(Render *render) {
+        AbstractPrimitive::render = render;
+    }
+};
+
+
+class Point: public AbstractPrimitive {
+public:
+    Point(Render *render): AbstractPrimitive(render) {}
+
+    void draw(int x, int y, SDL_Color color=WHITE) {
+        Point::render->draw(x, y, color);
+    }
+};
+
+
 int main() {
     Engine *engine = new Engine();
+    Point point(engine->render);
 
     engine->render->clear();
 
-    engine->render->draw(300, 300, RED);
-    engine->render->draw(350, 350, GREEN);
-    engine->render->draw(330, 320);
+    point.draw(400, 400);
+    point.draw(430, 420, RED);
+    point.draw(300, 300, RED);
+    point.draw(350, 350, GREEN);
+    point.draw(330, 320);
     engine->render->flush();
 
     engine->loop();
