@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 
 #include <SDL2/SDL.h>
@@ -122,6 +123,10 @@ public:
 
 
 class AbstractPrimitive {
+/**
+ * Abstract class graphic primitives
+ */
+
 public:
     Render *render;
 
@@ -141,12 +146,48 @@ public:
 };
 
 
+class Line: public AbstractPrimitive {
+public:
+    Line(Render *render): AbstractPrimitive(render) {}
+
+    void draw(int x0, int y0, int x1, int y1, SDL_Color color=WHITE) {
+        const int dx = abs(x1 - x0);
+        const int dy = abs(y1 - y0);
+        const int sx = (x0 < x1) ? 1 : -1;
+        const int sy = (y0 < y1) ? 1 : -1;
+        int error = dx - dy;
+
+        Line::render->draw(x1, y1, color);
+
+        while(x0 != x1 || y0 != y1) {
+            int error2 = error * 2;
+
+            Line::render->draw(x0, y0, color);
+
+            if(error2 > -dy) {
+                x0 += sx;
+                error -= dy;
+            }
+
+            if(error2 < dx) {
+                y0 += sy;
+                error += dx;
+            }
+        }
+    }
+};
+
+
 int main() {
     Engine *engine = new Engine();
     Point point(engine->render);
+    Line line(engine->render);
 
     engine->render->clear();
 
+    line.draw(10, 10, 400, 400, RED);
+    line.draw(20, 300, 420, 40, GREEN);
+    line.draw(300, 350, 100, 300, BLUE);
     point.draw(400, 400);
     point.draw(430, 420, RED);
     point.draw(300, 300, RED);
