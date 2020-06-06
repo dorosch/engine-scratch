@@ -1,5 +1,9 @@
+#include <string>
+#include <vector>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include <SDL2/SDL.h>
 
@@ -9,6 +13,125 @@ const SDL_Color RED = {.r = 255, .g = 0, .b = 0};
 const SDL_Color GREEN = {.r = 0, .g = 255, .b = 0};
 const SDL_Color BLUE = {.r = 0, .g = 0, .b = 255};
 const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255};
+
+
+class Vector {
+public:
+    float x;
+    float y;
+    float z;
+};
+
+
+class Triangle {
+public:
+    Vector v0;
+    Vector v1;
+    Vector v2;
+
+    Triangle(Vector v0, Vector v1, Vector v2) {
+        Triangle::v0 = v0;
+        Triangle::v1 = v1;
+        Triangle::v2 = v2;
+    }
+};
+
+
+class Model {
+/**
+ * A very simple class to load models from a .obj file.
+ *
+ * The file contains a set of triangle vertices:
+ *     v -1.2 2.1 0.0
+ *     v -2.0 0.5 1.0
+ *     v -0.3 0.1 2.0
+ *     ...
+ *     f 1/3725 2/2454 3/2447
+ *     ...
+ *
+ * Each line starting with 'v' is a vertex. The vertex is
+ * represented in three-dimensional space by three coordinates:
+ * x, y, z.
+ *
+ * Each line that starts with 'f' is a facet. Each facet is
+ * represented by a triangle. Each first number in a facet
+ * definition is the vertex index.
+ *
+ * In the example file, vertex 'f' describes a triangle:
+ *     (-1.2, 2.1, 0.0)
+ *     (-2.0, 0.5, 1.0)
+ *     (-0.3, 0.1, 2.0)
+ */
+
+private:
+    std::string _file_path;
+    std::vector<Vector> _vertices;
+
+public:
+    std::vector<Triangle> facets;
+
+    Model(std::string file_path) {
+        Model::_file_path = file_path;
+    }
+
+    void load() {
+        std::string line;
+        std::ifstream file(Model::_file_path);
+
+        if (file.is_open() == false) {
+            std::cerr <<
+                "Error render model: " << Model::_file_path << std::endl;
+            return;
+        }
+
+        while (std::getline(file, line)) {
+            char type;
+            std::string x, y, z;
+            std::stringstream string(line);
+
+            if (line.rfind("v ", 0) == false) {
+                Vector v;
+
+                string >> type >> x >> y >> z;
+
+                v.x = std::stof(x);
+                v.y = std::stof(y);
+                v.z = std::stof(z);
+
+                Model::_vertices.push_back(v);
+            }
+
+            if (line.rfind("f ", 0) == false) {
+                int index[3];
+                char separator = '/';
+                std::string a, b;
+
+                string >> type >> x >> y >> z;
+
+                std::stringstream facet_x(x);
+                std::getline(facet_x, a, separator);
+                std::getline(facet_x, b, separator);
+                index[0] = std::stoi(a) - 1;
+
+                std::stringstream facet_y(y);
+                std::getline(facet_y, a, separator);
+                std::getline(facet_y, b, separator);
+                index[1] = std::stoi(a) - 1;
+
+                std::stringstream facet_z(z);
+                std::getline(facet_z, a, separator);
+                std::getline(facet_z, b, separator);
+                index[2] = std::stoi(a) - 1;
+
+                Model::facets.push_back({
+                    Model::_vertices[index[0]],
+                    Model::_vertices[index[1]],
+                    Model::_vertices[index[2]],
+                });
+            }
+        }
+    }
+};
 
 
 class Window {
@@ -183,16 +306,17 @@ int main() {
     Point point(engine->render);
     Line line(engine->render);
 
+    Model deer("models/deer.obj");
+    deer.load();
+
     engine->render->clear();
 
-    line.draw(10, 10, 400, 400, RED);
-    line.draw(20, 300, 420, 40, GREEN);
-    line.draw(300, 350, 100, 300, BLUE);
-    point.draw(400, 400);
-    point.draw(430, 420, RED);
-    point.draw(300, 300, RED);
-    point.draw(350, 350, GREEN);
-    point.draw(330, 320);
+    for (auto triangle : deer.facets) {
+        line.draw(triangle.v0.x, triangle.v0.y, triangle.v1.x, triangle.v1.y);
+        line.draw(triangle.v1.x, triangle.v1.y, triangle.v2.x, triangle.v2.y);
+        line.draw(triangle.v2.x, triangle.v2.y, triangle.v0.x, triangle.v0.y);
+    }
+
     engine->render->flush();
 
     engine->loop();
