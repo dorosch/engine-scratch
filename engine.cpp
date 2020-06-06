@@ -217,21 +217,92 @@ public:
 };
 
 
+class Keyboard {
+/**
+ * Simple keyboard callback registration class
+ */
+
+private:
+    void (*_callback_press)(SDL_Event &);
+
+public:
+    void press(void (*function)(SDL_Event &)) {
+        Keyboard::_callback_press = function;
+    }
+
+    void event(SDL_Event &event) {
+        if (Keyboard::_callback_press != NULL) {
+            Keyboard::_callback_press(event);
+        }
+    }
+};
+
+
+class Mouse {
+/**
+ * Simple mouse callback registration class
+ */
+
+private:
+    void (*_callback_move)(SDL_Event &);
+    void (*_callback_press)(SDL_Event &);
+
+public:
+    void move(void (*function)(SDL_Event &)) {
+        Mouse::_callback_move = function;
+    }
+
+    void press(void (*function)(SDL_Event &)) {
+        Mouse::_callback_press = function;
+    }
+
+    void event_move(SDL_Event &event) {
+        if (Mouse::_callback_move != NULL) {
+            Mouse::_callback_move(event);
+        }
+    }
+
+    void event_press(SDL_Event &event) {
+        if (Mouse::_callback_press != NULL) {
+            Mouse::_callback_press(event);
+        }
+    }
+};
+
+
 class Engine {
 public:
     Window *window;
     Render *render;
+    Mouse *mouse;
+    Keyboard *keyboard;
 
     Engine() {
         Engine::window = new Window();
         Engine::render = new Render(window);
+        Engine::mouse = new Mouse();
+        Engine::keyboard = new Keyboard();
     }
 
     void loop() {
         SDL_Event event;
+
         while (true) {
-            if (SDL_PollEvent(&event) && event.type == SDL_QUIT) {
-                break;
+            if (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    break;
+                }
+                else if (event.type == SDL_MOUSEMOTION) {
+                    Engine::mouse->event_move(event);
+                }
+                else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                    Engine::mouse->event_press(event);
+                }
+                else if (
+                    event.type == SDL_KEYDOWN || event.type == SDL_KEYUP
+                ) {
+                    Engine::keyboard->event(event);
+                }
             }
         }
     }
@@ -239,6 +310,8 @@ public:
     ~Engine() {
         delete Engine::window;
         delete Engine::render;
+        delete Engine::mouse;
+        delete Engine::keyboard;
 
         SDL_Quit();
     }
@@ -301,10 +374,45 @@ public:
 };
 
 
+/*********************************************************************/
+/************************* END ENGINE SOURCE *************************/
+/*********************************************************************/
+
+
+void press(SDL_Event &event) {
+    switch (event.key.keysym.sym) {
+        case SDLK_LEFT:
+            std::cout << "left" << std::endl;
+            break;
+        case SDLK_RIGHT:
+            std::cout << "right" << std::endl;
+            break;
+        case SDLK_UP:
+            std::cout << "up" << std::endl;
+            break;
+        case SDLK_DOWN:
+            std::cout << "down" << std::endl;
+            break;
+    }
+}
+
+
+void move(SDL_Event &event) {
+    std::cout <<
+        "x: " << event.motion.x << "; " <<
+        "y: " << event.motion.y << std::endl;
+}
+
+
 int main() {
     Engine *engine = new Engine();
     Point point(engine->render);
     Line line(engine->render);
+
+    void (*function_move)(SDL_Event &) = move;
+    void (*function_press)(SDL_Event &) = press;
+    engine->mouse->move(function_move);
+    engine->keyboard->press(function_press);
 
     Model deer("models/deer.obj");
     deer.load();
