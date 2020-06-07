@@ -4,12 +4,13 @@
 #include "model.hpp"
 #include "math.hpp"
 #include "primitive.hpp"
+#include "math/vector.hpp"
 
 
 Engine *engine = new Engine();
-Point point(engine->render);
 Line line(engine->render);
 Model deer("data/models/deer.obj");
+const int move_speed = 10;
 
 
 void draw() {
@@ -27,9 +28,9 @@ void draw() {
 
 void up() {
     for (Triangle &triangle : deer.facets) {
-        triangle.v0.y += 10;
-        triangle.v1.y += 10;
-        triangle.v2.y += 10;
+        triangle.v0.y += move_speed;
+        triangle.v1.y += move_speed;
+        triangle.v2.y += move_speed;
     }
 
     draw();
@@ -38,9 +39,9 @@ void up() {
 
 void down() {
     for (Triangle &triangle : deer.facets) {
-        triangle.v0.y -= 10;
-        triangle.v1.y -= 10;
-        triangle.v2.y -= 10;
+        triangle.v0.y -= move_speed;
+        triangle.v1.y -= move_speed;
+        triangle.v2.y -= move_speed;
     }
 
     draw();
@@ -49,9 +50,9 @@ void down() {
 
 void left() {
     for (Triangle &triangle : deer.facets) {
-        triangle.v0.x += 10;
-        triangle.v1.x += 10;
-        triangle.v2.x += 10;
+        triangle.v0.x += move_speed;
+        triangle.v1.x += move_speed;
+        triangle.v2.x += move_speed;
     }
 
     draw();
@@ -60,9 +61,9 @@ void left() {
 
 void right() {
     for (Triangle &triangle : deer.facets) {
-        triangle.v0.x -= 10;
-        triangle.v1.x -= 10;
-        triangle.v2.x -= 10;
+        triangle.v0.x -= move_speed;
+        triangle.v1.x -= move_speed;
+        triangle.v2.x -= move_speed;
     }
 
     draw();
@@ -99,7 +100,6 @@ void move(SDL_Event &event) {
 
 
 int main() {
-
     void (*function_move)(SDL_Event &) = move;
     void (*function_press)(SDL_Event &) = press;
     engine->mouse->move(function_move);

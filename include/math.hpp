@@ -1,13 +1,7 @@
 #ifndef __MATH_HPP__
 #define __MATH_HPP__
 
-
-class Vector {
-public:
-    float x;
-    float y;
-    float z;
-};
+#include "math/vector.hpp"
 
 
 class Triangle {

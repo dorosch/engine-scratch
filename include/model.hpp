@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "math.hpp"
+#include "math/vector.hpp"
 
 
 class Model {
