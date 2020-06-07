@@ -52,11 +52,9 @@ void Model::load() {
             std::getline(facet_z, a, separator);
             index[2] = std::stoi(a) - 1;
 
-            Model::facets.push_back({
-                Model::_vertices[index[0]],
-                Model::_vertices[index[1]],
-                Model::_vertices[index[2]],
-            });
+            Model::facets.push_back(Model::_vertices[index[0]]);
+            Model::facets.push_back(Model::_vertices[index[1]]);
+            Model::facets.push_back(Model::_vertices[index[2]]);
         }
     }
 }

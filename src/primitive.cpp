@@ -36,3 +36,12 @@ void Line::draw(int x0, int y0, int x1, int y1, SDL_Color color) {
         }
     }
 }
+
+
+void Triangle::draw(Vector &v0, Vector &v1, Vector &v2) {
+    Line line(this->render);
+
+    line.draw(v0.x, v0.y, v1.x, v1.y);
+    line.draw(v1.x, v1.y, v2.x, v2.y);
+    line.draw(v2.x, v2.y, v0.x, v0.y);
+}

@@ -8,7 +8,6 @@
 #include <sstream>
 #include <iostream>
 
-#include "math.hpp"
 #include "math/vector.hpp"
 
 
@@ -43,7 +42,7 @@ private:
     std::vector<Vector> _vertices;
 
 public:
-    std::vector<Triangle> facets;
+    std::vector<Vector> facets;
 
     Model(std::string);
 

@@ -2,7 +2,6 @@
 
 #include "engine.hpp"
 #include "model.hpp"
-#include "math.hpp"
 #include "primitive.hpp"
 #include "math/vector.hpp"
 
@@ -16,10 +15,12 @@ const int move_speed = 10;
 void draw() {
     engine->render->clear();
 
-    for (auto triangle : deer.facets) {
-        line.draw(triangle.v0.x, triangle.v0.y, triangle.v1.x, triangle.v1.y);
-        line.draw(triangle.v1.x, triangle.v1.y, triangle.v2.x, triangle.v2.y);
-        line.draw(triangle.v2.x, triangle.v2.y, triangle.v0.x, triangle.v0.y);
+    Triangle triangle(engine->render);
+
+    for (int index = 0; index < deer.facets.size(); index += 3) {
+        triangle.draw(
+            deer.facets[index], deer.facets[index + 1], deer.facets[index + 2]
+        );
     }
 
     engine->render->flush();
@@ -27,10 +28,8 @@ void draw() {
 
 
 void up() {
-    for (Triangle &triangle : deer.facets) {
-        triangle.v0.y += move_speed;
-        triangle.v1.y += move_speed;
-        triangle.v2.y += move_speed;
+    for (Vector &v : deer.facets) {
+        v.y += move_speed;
     }
 
     draw();
@@ -38,10 +37,8 @@ void up() {
 
 
 void down() {
-    for (Triangle &triangle : deer.facets) {
-        triangle.v0.y -= move_speed;
-        triangle.v1.y -= move_speed;
-        triangle.v2.y -= move_speed;
+    for (Vector &v : deer.facets) {
+        v.y -= move_speed;
     }
 
     draw();
@@ -49,10 +46,8 @@ void down() {
 
 
 void left() {
-    for (Triangle &triangle : deer.facets) {
-        triangle.v0.x += move_speed;
-        triangle.v1.x += move_speed;
-        triangle.v2.x += move_speed;
+    for (Vector &v : deer.facets) {
+        v.x += move_speed;
     }
 
     draw();
@@ -60,10 +55,8 @@ void left() {
 
 
 void right() {
-    for (Triangle &triangle : deer.facets) {
-        triangle.v0.x -= move_speed;
-        triangle.v1.x -= move_speed;
-        triangle.v2.x -= move_speed;
+    for (Vector &v : deer.facets) {
+        v.x -= move_speed;
     }
 
     draw();
