@@ -4,6 +4,7 @@
 #include "model.hpp"
 #include "primitive.hpp"
 #include "math/vector.hpp"
+#include "math/matrix.hpp"
 
 
 Engine *engine = new Engine();
@@ -93,6 +94,11 @@ void move(SDL_Event &event) {
 
 
 int main() {
+    Matrix m, n;
+    n(1, 1) = 0;
+    m = n;
+    std::cout << m << std::endl;
+
     void (*function_move)(SDL_Event &) = move;
     void (*function_press)(SDL_Event &) = press;
     engine->mouse->move(function_move);
